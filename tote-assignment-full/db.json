@@ -1,0 +1,31 @@
+{
+  "totes": [
+    {
+      "toteId": "demo-tote-1",
+      "items": [
+        {
+          "id": "1",
+          "sku": "MILK-1",
+          "name": "Chocolate Milk 1L",
+          "quantity": 2,
+          "imageUrl": ""
+        },
+        {
+          "id": "2",
+          "sku": "BREAD-3",
+          "name": "Wholegrain Bread",
+          "quantity": 1,
+          "imageUrl": ""
+        },
+        {
+          "id": "3",
+          "sku": "EGG-12",
+          "name": "Egg Tray (12)",
+          "quantity": 1,
+          "imageUrl": ""
+        }
+      ],
+      "updatedAt": "2025-10-18T12:00:00Z"
+    }
+  ]
+}

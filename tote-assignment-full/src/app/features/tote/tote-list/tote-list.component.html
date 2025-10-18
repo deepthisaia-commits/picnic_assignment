@@ -1,0 +1,26 @@
+
+<div class="tote-page">
+  <mat-card>
+    <mat-card-title>Tote contents</mat-card-title>
+    <mat-card-content>
+      <div *ngIf="loading" role="status" aria-live="polite">Loading tote contents…</div>
+
+      <div *ngIf="error" class="error" role="alert">
+        <p>Error: {{ error }}</p>
+        <button mat-raised-button (click)="load()" aria-label="Retry">Retry</button>
+      </div>
+
+      <ng-container *ngIf="!loading && !error">
+        <ng-container *ngIf="data$ | async as data">
+          <p>Updated: {{ data.updatedAt | date:'short' }}</p>
+          <mat-list>
+            <mat-list-item *ngFor="let item of data.items; trackBy: trackByItemId" tabindex="0">
+              <div mat-line><strong>{{ item.name }}</strong></div>
+              <div mat-line>SKU: {{ item.sku }} — Quantity: {{ item.quantity }}</div>
+            </mat-list-item>
+          </mat-list>
+        </ng-container>
+      </ng-container>
+    </mat-card-content>
+  </mat-card>
+</div>
