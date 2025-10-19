@@ -1,0 +1,130 @@
+<mat-card class="scanner-card" role="region" aria-label="Barcode scanner">
+  <mat-card-header>
+    <mat-card-title>
+      <mat-icon>qr_code_scanner</mat-icon>
+      <span>Scan Tote Barcode</span>
+      <span class="scan-count" *ngIf="scanHistory.length > 0">
+        ({{ scanHistory.length }} scanned)
+      </span>
+    </mat-card-title>
+    <div class="header-actions">
+      <button
+        mat-icon-button
+        (click)="toggleHistory()"
+        [attr.aria-label]="showHistory ? 'Hide scan history' : 'Show scan history'"
+        matTooltip="Scan History">
+        <mat-icon>history</mat-icon>
+      </button>
+    </div>
+  </mat-card-header>
+
+  <mat-card-content>
+    <div class="scanner-input-container">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Enter Tote ID</mat-label>
+        <input
+          #barcodeInput
+          matInput
+          [formControl]="barcodeControl"
+          (keypress)="onKeyPress($event)"
+          placeholder="e.g., demo-tote-1"
+          aria-label="Tote barcode input"
+          [attr.aria-invalid]="barcodeControl.invalid && barcodeControl.touched"
+          [attr.aria-describedby]="barcodeControl.invalid ? 'barcode-error' : null"
+          autocomplete="off"
+          appAutoFocus
+          appInputTrim
+          maxlength="50">
+        <mat-icon matPrefix>barcode_reader</mat-icon>
+
+        <button
+          mat-icon-button
+          matSuffix
+          *ngIf="barcodeControl.value"
+          (click)="clearInput()"
+          aria-label="Clear input"
+          type="button"
+          matTooltip="Clear">
+          <mat-icon>close</mat-icon>
+        </button>
+
+        <mat-hint align="start">
+          Min 3 characters, letters, numbers, hyphens, underscores only
+        </mat-hint>
+        <mat-hint align="end">
+          {{ barcodeControl.value?.length || 0 }}/50
+        </mat-hint>
+
+        <mat-error id="barcode-error" *ngIf="barcodeControl.invalid">
+          {{ getErrorMessage() }}
+        </mat-error>
+      </mat-form-field>
+
+      <button
+        mat-raised-button
+        color="primary"
+        (click)="onScanClick()"
+        [disabled]="barcodeControl.invalid || isRateLimited || (isLoading$ | async)"
+        class="scan-button"
+        aria-label="Scan barcode"
+        [matTooltip]="isRateLimited ? 'Please wait before scanning again' : 'Scan barcode (Enter)'">
+        <mat-icon *ngIf="!(isLoading$ | async) && !isRateLimited">qr_code_scanner</mat-icon>
+        <mat-spinner *ngIf="isLoading$ | async" diameter="20" class="button-spinner"></mat-spinner>
+        <span>{{ (isLoading$ | async) ? 'Scanning...' : 'Scan' }}</span>
+      </button>
+    </div>
+
+    <div class="scanner-status" *ngIf="(scanStatus$ | async) as status" role="status" aria-live="polite">
+      <div *ngIf="status === ScanStatus.SUCCESS" class="status-success">
+        <mat-icon>check_circle</mat-icon>
+        <span>Successfully scanned: <strong>{{ lastScannedId$ | async }}</strong></span>
+      </div>
+
+      <div *ngIf="status === ScanStatus.ERROR" class="status-error">
+        <mat-icon>error</mat-icon>
+        <span>Scan failed. Please check the barcode and try again.</span>
+      </div>
+    </div>
+
+    <div class="scan-history" *ngIf="showHistory && scanHistory.length > 0" @slideIn>
+      <div class="history-header">
+        <h3>Recent Scans</h3>
+        <button mat-button (click)="clearHistory()" color="warn">
+          <mat-icon>delete</mat-icon>
+          Clear History
+        </button>
+      </div>
+
+      <mat-list class="history-list">
+        <mat-list-item
+          *ngFor="let item of scanHistory; let i = index"
+          (click)="selectFromHistory(item)"
+          class="history-item"
+          role="button"
+          tabindex="0"
+          [attr.aria-label]="'Scan ' + item">
+          <mat-icon matListItemIcon>history</mat-icon>
+          <div matListItemTitle>{{ item }}</div>
+          <div matListItemLine class="history-meta">Scan #{{ scanHistory.length - i }}</div>
+        </mat-list-item>
+      </mat-list>
+    </div>
+
+    <div class="keyboard-hints">
+      <mat-chip-listbox aria-label="Keyboard shortcuts">
+        <mat-chip>
+          <mat-icon>keyboard</mat-icon>
+          Enter to scan
+        </mat-chip>
+        <mat-chip>
+          <mat-icon>keyboard</mat-icon>
+          Ctrl+K to focus
+        </mat-chip>
+        <mat-chip>
+          <mat-icon>keyboard</mat-icon>
+          F3 to focus
+        </mat-chip>
+      </mat-chip-listbox>
+    </div>
+  </mat-card-content>
+</mat-card>
